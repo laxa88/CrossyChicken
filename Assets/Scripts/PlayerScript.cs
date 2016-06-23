@@ -303,10 +303,10 @@ public class PlayerScript : MonoBehaviour {
 		AudioManagerScript.playSound("smack");
 
 		// Try to show ad after playing 3 times
-		if (Global.playcount > 3)
+		if (Global.playcount >= 3)
 		{
-			FindObjectOfType<AdManagerScript>().showInterstitial();
 			Global.playcount = 0;
+			FindObjectOfType<AdManagerScript>().showInterstitial();
 		}
 		else
 		{

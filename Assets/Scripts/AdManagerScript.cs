@@ -12,8 +12,13 @@ public class AdManagerScript : MonoBehaviour {
 	BannerView bannerView;
 	InterstitialAd interstitial;
 
+
 	void Start ()
 	{
+		Global.loadAdData();
+
+		if (Global.adsRemoved) return;
+
 		// Immediately create ads when game starts
 		RequestBanner();
 		RequestInterstitial();
@@ -21,6 +26,8 @@ public class AdManagerScript : MonoBehaviour {
 
 	void RequestBanner ()
 	{
+		if (Global.adsRemoved) return;
+
 	    #if UNITY_ANDROID
 		string adUnitId = "ca-app-pub-4334550757239277/9796943146"; // banner ad android ID
 	    #elif UNITY_IPHONE
@@ -41,6 +48,8 @@ public class AdManagerScript : MonoBehaviour {
 
 	void RequestInterstitial()
 	{
+		if (Global.adsRemoved) return;
+
 	    #if UNITY_ANDROID
 		string adUnitId = "ca-app-pub-4334550757239277/5087541944"; // interstitial ad android ID
 	    #elif UNITY_IPHONE
@@ -51,6 +60,7 @@ public class AdManagerScript : MonoBehaviour {
 
 	    // Initialize an InterstitialAd.
 	    interstitial = new InterstitialAd(adUnitId);
+		interstitial.OnAdClosed += OnInterstitialComplete;
 
 	    // Create an empty ad request.
 	    AdRequest request = new AdRequest.Builder().Build();
@@ -61,7 +71,7 @@ public class AdManagerScript : MonoBehaviour {
 
 	public void showInterstitial ()
 	{
-		interstitial.OnAdClosed += OnInterstitialComplete;
+		if (Global.adsRemoved) return;
 
 		if (interstitial.IsLoaded()) {
 			interstitial.Show();
@@ -70,19 +80,40 @@ public class AdManagerScript : MonoBehaviour {
 
 	void OnInterstitialComplete (object o, System.EventArgs e)
 	{
+		if (Global.adsRemoved) return;
+
 		// interstitials need to be re-created after it is shown
 		RequestInterstitial();
 	}
 
 	public void showBanner ()
 	{
+		if (Global.adsRemoved) return;
+
 		if (bannerView != null)
 			bannerView.Show();
 	}
 
 	public void hideBanner ()
 	{
+		if (Global.adsRemoved) return;
+
 		if (bannerView != null)
 			bannerView.Hide();
+	}
+
+	public void removeAds ()
+	{
+		if (Global.adsRemoved) return;
+
+		Global.adsRemoved = true;
+
+		if (bannerView != null)
+			bannerView.Destroy();
+
+		if (interstitial != null)
+			interstitial.Destroy();
+
+		Global.saveAdData(); // saves the adsremoved value
 	}
 }

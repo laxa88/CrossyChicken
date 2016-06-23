@@ -23,8 +23,8 @@ namespace CompleteProject
         // when defining the Product Identifiers on the store. Except, for illustration purposes, the 
         // kProductIDSubscription - it has custom Apple and Google identifiers. We declare their store-
         // specific mapping to Unity Purchasing's AddProduct, below.
-        public static string kProductIDConsumable =    "consumable";   
-        public static string kProductIDNonConsumable = "nonconsumable";
+		public static string kProductIDConsumable =    "crossy_chicken_support";   
+		public static string kProductIDNonConsumable = "crossy_chicken_remove_ads";
         public static string kProductIDSubscription =  "subscription"; 
          
         // Apple App Store-specific product identifier for the subscription product.
@@ -35,6 +35,8 @@ namespace CompleteProject
         
         void Start()
         {
+        	DebugScript.Log("Start Purchaser");
+
             // If we haven't set up the Unity Purchasing reference
             if (m_StoreController == null)
             {
@@ -45,6 +47,8 @@ namespace CompleteProject
         
         public void InitializePurchasing() 
         {
+			DebugScript.Log("Init Purchaser");
+
             // If we have already connected to Purchasing ...
             if (IsInitialized())
             {
@@ -81,6 +85,7 @@ namespace CompleteProject
         
         public void BuyConsumable()
         {
+			DebugScript.Log("Buy Consumable");
             // Buy the consumable product using its general identifier. Expect a response either 
             // through ProcessPurchase or OnPurchaseFailed asynchronously.
             BuyProductID(kProductIDConsumable);
@@ -89,6 +94,7 @@ namespace CompleteProject
         
         public void BuyNonConsumable()
         {
+			DebugScript.Log("Buy Non-consumable");
             // Buy the non-consumable product using its general identifier. Expect a response either 
             // through ProcessPurchase or OnPurchaseFailed asynchronously.
             BuyProductID(kProductIDNonConsumable);
@@ -107,6 +113,7 @@ namespace CompleteProject
         
         void BuyProductID(string productId)
         {
+			DebugScript.Log("Buy product : " + productId);
             // If Purchasing has been initialized ...
             if (IsInitialized())
             {
@@ -182,6 +189,8 @@ namespace CompleteProject
         
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
         {
+			DebugScript.Log("Done Initialise!");
+
             // Purchasing has succeeded initializing. Collect our Purchasing references.
             Debug.Log("OnInitialized: PASS");
             
@@ -194,6 +203,8 @@ namespace CompleteProject
         
         public void OnInitializeFailed(InitializationFailureReason error)
         {
+			DebugScript.Log("Fail to initialise!");
+
             // Purchasing set-up has not succeeded. Check error for reason. Consider sharing this reason with the user.
             Debug.Log("OnInitializeFailed InitializationFailureReason:" + error);
         }
@@ -201,16 +212,22 @@ namespace CompleteProject
         
         public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs args) 
         {
+			DebugScript.Log("*** Process Purchase : " + args.purchasedProduct.definition.id);
+
             // A consumable product has been purchased by this user.
             if (String.Equals(args.purchasedProduct.definition.id, kProductIDConsumable, StringComparison.Ordinal))
             {
                 Debug.Log(string.Format("ProcessPurchase: PASS. Product: '{0}'", args.purchasedProduct.definition.id));// The consumable item has been successfully purchased, add 100 coins to the player's in-game score.
                 //ScoreManager.score += 100;
+
+                // Nothing happens - you just support the developer!
             }
             // Or ... a non-consumable product has been purchased by this user.
             else if (String.Equals(args.purchasedProduct.definition.id, kProductIDNonConsumable, StringComparison.Ordinal))
             {
                 Debug.Log(string.Format("ProcessPurchase: PASS. Product: '{0}'", args.purchasedProduct.definition.id));// TODO: The non-consumable item has been successfully purchased, grant this item to the player.
+
+				FindObjectOfType<AdManagerScript>().removeAds();
             }
             // Or ... a subscription product has been purchased by this user.
             else if (String.Equals(args.purchasedProduct.definition.id, kProductIDSubscription, StringComparison.Ordinal))
@@ -231,6 +248,8 @@ namespace CompleteProject
         
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
+			DebugScript.Log("Purchase FAILED : " + product.definition.id);
+
             // A product purchase attempt did not succeed. Check failureReason for more detail. Consider sharing 
             // this reason with the user to guide their troubleshooting actions.
             Debug.Log(string.Format("OnPurchaseFailed: FAIL. Product: '{0}', PurchaseFailureReason: {1}", product.definition.storeSpecificId, failureReason));}

@@ -13,6 +13,7 @@ public class Global {
 	public static int hiscore = 0;
 	public static bool isResume = false;
 	public static int playcount = 0;
+	public static bool adsRemoved = false; // this is static so it can be used across the whole game
 
 
 
@@ -39,5 +40,21 @@ public class Global {
 		// word below and click "Go to Declaration" to jump to the code.
 
 		GameObject.FindObjectOfType<UIManagerScript>().updateUI();
+	}
+
+	public static void saveAdData ()
+	{
+		// PlayerPrefs can only store Int, Float or String
+		// So, convert to bool manually.
+		int v = (adsRemoved) ? 1 : 0; // 1 = true, 0 = false
+		PlayerPrefs.SetInt("adremoved", v);
+	}
+
+	public static void loadAdData ()
+	{
+		// PlayerPrefs can only store Int, Float or String
+		// So, convert to bool manually.
+		int v = PlayerPrefs.GetInt("adremoved", 0);
+		adsRemoved = (v == 1) ? true : false;
 	}
 }
